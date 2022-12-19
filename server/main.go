@@ -1,4 +1,3 @@
-
 // Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -9,9 +8,13 @@ import (
 	"flag"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
+
+var hubs = make(map[string]*Hub)
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL)
@@ -27,16 +30,27 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-    log.Println("Starting server...")
+	log.Println("Starting server...")
 	flag.Parse()
-	hub := newHub()
-	go hub.run()
-	http.HandleFunc("/", serveHome)
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(hub, w, r)
+
+	router := gin.New()
+
+	router.LoadHTMLFiles("home.html")
+
+	router.GET("/room/:roomId", func(c *gin.Context) {
+		c.HTML(200, "home.html", nil)
 	})
-	err := http.ListenAndServe(*addr, nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+
+	router.GET("/ws/:roomId", func(c *gin.Context) {
+		roomId := c.Param("roomId")
+		hub, ok := hubs[roomId]
+		if !ok {
+			hub = newHub()
+			go hub.run()
+			hubs[roomId] = hub
+		}
+		serveWs(hub, c.Writer, c.Request)
+	})
+
+    router.Run("0.0.0.0:8080")
 }

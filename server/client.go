@@ -41,6 +41,8 @@ var upgrader = websocket.Upgrader{
 type Client struct {
 	hub *Hub
 
+    uid string
+
 	// The websocket connection.
 	conn *websocket.Conn
 
@@ -70,6 +72,7 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+        message = append(message, []byte(" test ")...)
 		c.hub.broadcast <- message
 	}
 }
