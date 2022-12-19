@@ -35,12 +35,6 @@ func main() {
 
 	router := gin.New()
 
-	router.LoadHTMLFiles("home.html")
-
-	router.GET("/room/:roomId", func(c *gin.Context) {
-		c.HTML(200, "home.html", nil)
-	})
-
 	router.GET("/ws/:roomId", func(c *gin.Context) {
 		roomId := c.Param("roomId")
 		hub, ok := hubs[roomId]
@@ -52,5 +46,5 @@ func main() {
 		serveWs(hub, c.Writer, c.Request)
 	})
 
-    router.Run("0.0.0.0:8080")
+    router.Run("0.0.0.0:7000")
 }

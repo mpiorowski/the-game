@@ -41,7 +41,7 @@ var upgrader = websocket.Upgrader{
 type Client struct {
 	hub *Hub
 
-    uid string
+	uid string
 
 	// The websocket connection.
 	conn *websocket.Conn
@@ -72,8 +72,8 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-        message = append(message, []byte(" test ")...)
-		c.hub.broadcast <- message
+        readMessage(c, message)
+		// c.hub.broadcast <- message
 	}
 }
 
@@ -125,6 +125,15 @@ func (c *Client) writePump() {
 
 // serveWs handles websocket requests from the peer.
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+
+	upgrader.CheckOrigin = func(r *http.Request) bool { 
+        // TODO: check origin
+        if r.Header.Get("Origin") == "http://localhost:3000" {
+            return true
+        }
+        return false
+    }
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
