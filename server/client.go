@@ -72,8 +72,7 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-        readMessage(c, message)
-		// c.hub.broadcast <- message
+        runGame(c, message)
 	}
 }
 

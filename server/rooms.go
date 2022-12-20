@@ -37,12 +37,12 @@ func joinRoom(c *gin.Context) {
 	if err == nil {
 		compareErr := bcrypt.CompareHashAndPassword([]byte(response.Password), []byte(request.Password))
 		if compareErr != nil {
-            c.JSON(401, gin.H{"error": "Invalid password"})
-            return
-		} else {
-			c.JSON(200, gin.H{"data": response})
+			c.JSON(401, gin.H{"error": "Invalid password"})
 			return
-        }
+		} else {
+			c.JSON(200, response)
+			return
+		}
 	}
 
 	if err == sql.ErrNoRows {
@@ -66,5 +66,5 @@ func joinRoom(c *gin.Context) {
 		}
 	}
 
-	c.JSON(200, gin.H{"data": response})
+	c.JSON(200, response)
 }
