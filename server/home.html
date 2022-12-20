@@ -6,6 +6,7 @@
 window.onload = function () {
     var conn;
     var msg = document.getElementById("msg");
+    var uid = document.getElementById("uid");
     var log = document.getElementById("log");
 
     function appendLog(item) {
@@ -23,13 +24,15 @@ window.onload = function () {
         if (!msg.value) {
             return false;
         }
-        conn.send(msg.value);
+        conn.send(JSON.stringify({msg: msg.value, uid: uid.value}));
         msg.value = "";
         return false;
     };
 
     if (window["WebSocket"]) {
-        conn = new WebSocket("ws://" + document.location.host + "/ws");
+        const params = window.location.href.split("/");
+        const roomId = params[params.length - 1];
+        conn = new WebSocket("ws://" + document.location.host + "/ws/" + roomId);
         conn.onclose = function (evt) {
             var item = document.createElement("div");
             item.innerHTML = "<b>Connection closed.</b>";
@@ -93,6 +96,7 @@ body {
 <form id="form">
     <input type="submit" value="Send" />
     <input type="text" id="msg" size="64" autofocus />
+    <input type="text" id="uid" size="64" autofocus />
 </form>
 </body>
 </html>
