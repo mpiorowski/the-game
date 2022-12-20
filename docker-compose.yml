@@ -26,6 +26,8 @@ services:
       - 7000:7000
     environment:
       ENV: development
+      DOMAIN: localhost
+      PORT: 7000
       DB_USER: postgres
       DB_PASS: 12345
       DB_HOST: db

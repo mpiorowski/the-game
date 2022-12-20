@@ -1,7 +1,6 @@
 import { writable, type Writable } from 'svelte/store';
 import { Config } from '../config';
 import type { SafeParseReturnType } from 'zod';
-import { auth } from './firebase.util';
 
 type UseApiResponse<D, V> = {
     fetching: Writable<boolean>;
@@ -72,9 +71,7 @@ type Options = {
  * @returns {Promise<T>} Promise
  */
 export const apiRequest = async <T>({ url, method, body }: Options): Promise<T> => {
-    const token = await auth.currentUser?.getIdToken();
     const headers = new Headers();
-    headers.append('Authorization', `Bearer ${token ?? ''}`);
 
     const response = await fetch(`${Config.VITE_API_URL}${url}`, {
         method: method,
@@ -83,7 +80,6 @@ export const apiRequest = async <T>({ url, method, body }: Options): Promise<T> 
         headers,
     });
     if (response.status === 401) {
-        void auth.signOut();
         throw new Error('Unauthorized');
     }
     if (response.status === 204) {

@@ -5,36 +5,74 @@
 package main
 
 import (
-	"flag"
+	"database/sql"
+	"fmt"
 	"log"
-	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	utils "github.com/mpiorowski/golang"
+	migrate "github.com/rubenv/sql-migrate"
 )
 
-var addr = flag.String("addr", ":8080", "http service address")
+var (
+	DOMAIN  = utils.MustGetenv("DOMAIN")
+	PORT    = utils.MustGetenv("PORT")
+	ENV     = utils.MustGetenv("ENV")
+	DB_USER = utils.MustGetenv("DB_USER")
+	DB_PASS = utils.MustGetenv("DB_PASS")
+	DB_HOST = utils.MustGetenv("DB_HOST")
+	DB_NAME = utils.MustGetenv("DB_NAME")
+)
 
 var hubs = make(map[string]*Hub)
+var db *sql.DB
 
-func serveHome(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL)
-	if r.URL.Path != "/" {
-		http.Error(w, "Not found", http.StatusNotFound)
-		return
+func init() {
+	// Db connection
+	var err error
+	dbURI := fmt.Sprintf("user=%s password=%s database=%s host=%s",
+		DB_USER, DB_PASS, DB_NAME, DB_HOST)
+	if db, err = sql.Open("pgx", dbURI); err != nil {
+		log.Fatal(err)
 	}
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
+	pingErr := db.Ping()
+	if pingErr != nil {
+		log.Fatal(pingErr)
 	}
-	http.ServeFile(w, r, "home.html")
+	log.Println("Connected to database")
+
+	// Migrations
+	migrations := &migrate.FileMigrationSource{
+		Dir: "./migrations",
+	}
+	n, err := migrate.Exec(db, "postgres", migrations, migrate.Up)
+	if err != nil {
+		log.Fatalf("Migrations failed: %v", err)
+	}
+	log.Printf("Applied %d migrations", n)
 }
 
 func main() {
 	log.Println("Starting server...")
-	flag.Parse()
+	if ENV == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+	router := gin.Default()
+	router.MaxMultipartMemory = 8 << 20 // 8 MiB
+	url := "http://" + DOMAIN + ":3000"
+	if ENV == "production" {
+		url = "https://www." + DOMAIN
+	}
 
-	router := gin.New()
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{url}
+	config.AllowCredentials = true
+	config.AllowHeaders = []string{"Authorization", "Content-Type"}
+	router.Use(cors.New(config))
 
+	router.POST("/rooms", joinRoom)
 	router.GET("/ws/:roomId", func(c *gin.Context) {
 		roomId := c.Param("roomId")
 		hub, ok := hubs[roomId]
@@ -46,5 +84,7 @@ func main() {
 		serveWs(hub, c.Writer, c.Request)
 	})
 
-    router.Run("0.0.0.0:7000")
+	if err := router.Run(fmt.Sprintf("0.0.0.0:%v", PORT)); err != nil {
+		panic(err)
+	}
 }
