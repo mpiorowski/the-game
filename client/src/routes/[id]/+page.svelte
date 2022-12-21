@@ -2,65 +2,54 @@
     import { Config } from "src/config";
     import { onMount } from "svelte";
     import { page } from "$app/stores";
+    import type { User } from "src/types";
+    import Users from "./users.svelte";
+    import Clues from "./clues.svelte";
+    import Guesses from "./guesses.svelte";
 
     const id = $page.params.id;
-
-    let nickname = "";
-
-    let users: {
-        id: string;
-        nickname: string;
-        team: string;
-        ready: boolean;
-    }[] = [];
-
-    let userId = "";
-
+    let users: User[] = [];
+    let user: User | null = null;
     let conn: WebSocket;
+    let isLoading = true;
+
+    type Response = {
+        users: User[];
+    };
+
+    type ClientResponse = {
+        user: User;
+    };
+
     onMount(async () => {
         conn = new WebSocket(Config.VITE_WS_URL + "/ws/" + id);
         conn.onclose = function (evt) {
             console.log(evt);
         };
         conn.onmessage = function (evt) {
-            const json = JSON.parse(evt.data);
-            if (json.type === "users") {
-                users = json.data;
+            const json = JSON.parse(evt.data) as Response | ClientResponse;
+            if ("users" in json) {
+                users = json.users || [];
+                const userId = localStorage.getItem("userId");
+                user = users.find((u) => u.id === userId) || null;
+            } else if ("user" in json) {
+                localStorage.setItem("userId", json.user.id);
             }
-            if (json.type === "user") {
-                userId = json.data.id;
-            }
+            isLoading = false;
+        };
+        conn.onopen = function () {
+            const user = localStorage.getItem("user") || "{}";
+            conn.send(JSON.stringify({ type: "join", data: user, room: id }));
         };
     });
-
-    const onSubmit = () => {
-        if (conn) {
-            conn.send(
-                JSON.stringify({ type: "nickname", data: nickname, room: id })
-            );
-        }
-    };
-
-    const onReady = () => {
-        if (conn) {
-            conn.send(JSON.stringify({ type: "ready", data: userId }));
-        }
-    };
 </script>
 
-<form id="form" on:submit|preventDefault={onSubmit}>
-    <input type="submit" value="Send" />
-    <input type="text" bind:value={nickname} size="64" />
-</form>
-
-<form id="form" on:submit|preventDefault={onReady}>
-    <input type="submit" value="Ready" />
-</form>
-
-{#each users as user}
-    <div style="display: flex; gap: 4px; flex-direction: row; align-items: center;">
-        <div>Nickname: {user.nickname}</div>
-        <div>Team: {user.team}</div>
-        <div>Ready: {user.ready}</div>
-    </div>
-{/each}
+{#if isLoading}
+    <div>Loading...</div>
+{:else if user?.step === 1 || !user}
+    <Users {conn} {users} />
+{:else if user.step === 2}
+    <Clues {conn} />
+{:else if user.step === 3}
+    <Guesses {conn} />
+{/if}

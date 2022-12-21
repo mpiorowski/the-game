@@ -20,6 +20,11 @@ type User struct {
 	Nickname string `json:"nickname"`
 	Team     string `json:"team"`
 	Ready    bool   `json:"ready"`
+    Step     int    `json:"step"`
+}
+
+type Respone struct {
+    Users []User `json:"users"`
 }
 
 var users []User
@@ -33,6 +38,18 @@ func runGame(c *Client, msg []byte) {
 		return
 	}
 
+    var respone Respone
+
+	if message.Type == "join" {
+        respone.Users = users
+		val, err := json.Marshal(respone)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		c.send <- []byte(val)
+	}
+
 	if message.Type == "nickname" {
 		uuid, err := uuid.NewV4()
 		if err != nil {
@@ -43,21 +60,24 @@ func runGame(c *Client, msg []byte) {
 			Id:       uuid.String(),
 			Nickname: message.Data,
 			Team:     "",
+			Ready:    false,
+            Step:     1,
 		}
 		users = append(users, *user)
-		jsonUsers, err := json.Marshal(users)
+        respone.Users = users
+        val, err := json.Marshal(respone)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		c.hub.broadcast <- []byte("{\"type\":\"users\",\"data\":" + string(jsonUsers) + "}")
+		c.hub.broadcast <- []byte(val)
 
 		jsonUser, err := json.Marshal(user)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		c.send <- []byte("{\"type\":\"user\",\"data\":" + string(jsonUser) + "}")
+		c.send <- []byte("{\"user\":" + string(jsonUser) + "}")
 	}
 
 	if message.Type == "ready" {
@@ -88,13 +108,31 @@ func runGame(c *Client, msg []byte) {
 			}
 		}
 
-		jsonUsers, err := json.Marshal(users)
+        respone.Users = users
+        val, err := json.Marshal(respone)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		c.hub.broadcast <- []byte("{\"type\":\"users\",\"data\":" + string(jsonUsers) + "}")
+		c.hub.broadcast <- []byte(val)
 	}
+
+    if message.Type == "clues" {
+        for i, user := range users {
+            if user.Id == message.Data {
+                users[i].Step = 2
+            }
+        }
+
+        respone.Users = users
+        val, err := json.Marshal(respone)
+        if err != nil {
+            log.Println(err)
+            return
+        }
+        c.hub.broadcast <- []byte(val)
+    }
+
 
 }
 
