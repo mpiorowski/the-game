@@ -6,7 +6,6 @@
     import Users from "./users.svelte";
     import Clues from "./clues.svelte";
     import Guesses from "./guesses.svelte";
-    import { userId } from "src/store";
 
     const id = $page.params.id;
     let users: User[] = [];
@@ -21,16 +20,16 @@
     };
 
     onMount(async () => {
-        // userId = localStorage.getItem("userId");
         conn = new WebSocket(Config.VITE_WS_URL + "/ws/" + id);
         conn.onclose = function (evt) {
             console.log(evt);
         };
         conn.onmessage = function (evt) {
+            const userId = localStorage.getItem("userId");
             const json = JSON.parse(evt.data) as Response;
             round = json.round;
             users = json.users || [];
-            user = users.find((u) => u.id === $userId) || null;
+            user = users.find((u) => u.id === userId) || null;
             isLoading = false;
         };
         conn.onopen = function () {
@@ -42,9 +41,9 @@
 {#if isLoading}
     <div>Loading...</div>
 {:else if user?.step === 1 || !user}
-    <Users {conn} {users} />
+    <Users {conn} {users} {user} />
 {:else if user.step === 2}
-    <Clues {conn} />
+    <Clues {conn} {user} />
 {:else if user.step === 3 || user.step === 4}
     <Guesses {conn} {user} {round} />
 {:else}

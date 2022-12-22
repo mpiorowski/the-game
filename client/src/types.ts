@@ -16,13 +16,14 @@ export type Room = {
 }
 
 export type Clue = {
-    id: string;
+    userId: string;
     word: string;
     type: string;
     guessed: boolean;
 }
 
 export type Round = {
+    game: number;
     team: string;
     clue: Clue;
     user: User;

@@ -1,6 +1,5 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import { userId } from "src/store";
     import type { Round, User } from "src/types";
 
     const id = $page.params.id;
@@ -8,10 +7,10 @@
     export let user: User;
     export let round: Round | null;
 
-    const onStartTimer = () => {
+    const onStartRound = () => {
         const request = JSON.stringify({
             type: "start-round",
-            data: $userId,
+            data: user.id,
             room: id,
         });
         conn.send(request);
@@ -37,11 +36,12 @@
 {#if user.step === 4 && round}
     <h1>Guesses</h1>
     <h2>
-        {round.team}
+        Game: {round.game}
+        Team: {round.team}
     </h2>
     {#if round.user.id === user.id && round.time === -1}
         <h2>Start Timer</h2>
-        <button on:click={onStartTimer}>Start timer</button>
+        <button on:click={onStartRound}>Start round</button>
     {/if}
     {#if round.user.id === user.id && round.time > 0}
         <h2>It's your turn</h2>

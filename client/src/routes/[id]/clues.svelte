@@ -1,25 +1,25 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import { userId } from "src/store";
-    import type { Clue } from "src/types";
+    import type { Clue, User } from "src/types";
 
     const id = $page.params.id;
     export let conn: WebSocket;
+    export let user: User;
 
     let movieClue: Clue = {
-        id: crypto.randomUUID(),
+        userId: user.id,
         word: "movieClue",
         type: "movie",
         guessed: false,
     };
     let personClue: Clue = {
-        id: crypto.randomUUID(),
+        userId: user.id,
         word: "personClue",
         type: "person",
         guessed: false,
     };
     let placeClue: Clue = {
-        id: crypto.randomUUID(),
+        userId: user.id,
         word: "placeClue",
         type: "place",
         guessed: false,
@@ -32,15 +32,14 @@
                 type: "send-clues",
                 data: JSON.stringify(clues),
                 room: id,
-                userId: $userId,
+                userId: user.id,
             })
         );
     };
 </script>
 
-<h1>Clues</h1>
-
 <form on:submit|preventDefault={onSendClues}>
+    <button type="submit">Submit</button>
     <label>
         Movie
         <input type="text" bind:value={movieClue.word} />
@@ -53,5 +52,4 @@
         Place
         <input type="text" bind:value={placeClue.word} />
     </label>
-    <button type="submit">Submit</button>
 </form>
