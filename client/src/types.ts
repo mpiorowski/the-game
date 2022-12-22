@@ -16,8 +16,10 @@ export type Room = {
 }
 
 export type Clue = {
+    id: string;
     word: string;
     type: string;
+    guessed: boolean;
 }
 
 export type Round = {

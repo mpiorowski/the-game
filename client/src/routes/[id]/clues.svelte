@@ -7,16 +7,22 @@
     export let conn: WebSocket;
 
     let movieClue: Clue = {
+        id: crypto.randomUUID(),
         word: "movieClue",
         type: "movie",
+        guessed: false,
     };
     let personClue: Clue = {
+        id: crypto.randomUUID(),
         word: "personClue",
         type: "person",
+        guessed: false,
     };
     let placeClue: Clue = {
+        id: crypto.randomUUID(),
         word: "placeClue",
         type: "place",
+        guessed: false,
     };
 
     const onSendClues = () => {

@@ -35,6 +35,7 @@ type User struct {
 }
 
 type Clue struct {
+	Id      int    `json:"id"`
 	Word    string `json:"word"`
 	Type    string `json:"type"`
 	Guessed bool   `json:"guessed"`
@@ -77,11 +78,7 @@ func runGame(c *Client, msg []byte, roomId string) {
 		log.Println(err)
 		return
 	}
-    log.Println(message)
-
-	if message.Type == "join" {
-		respone.Users = users
-	}
+	log.Println(message)
 
 	if message.Type == "nickname" {
 		var user User
@@ -172,8 +169,7 @@ func runGame(c *Client, msg []byte, roomId string) {
 				}
 			}
 			round.User = usersFromTeam[0]
-			// round.NextUser = usersFromTeam[1]
-			respone.Round = round
+			round.NextUser = usersFromTeam[1]
 
 			score = append(score, Score{Round: 1, Team1Clues: []Clue{}, Team2Clues: []Clue{}})
 		}
@@ -181,12 +177,11 @@ func runGame(c *Client, msg []byte, roomId string) {
 	}
 
 	if message.Type == "start-round" {
-		round.Time = 60
+		round.Time = 10
 		ticker = time.NewTicker(time.Second)
 		go func() {
 			for range ticker.C {
 				round.Time -= 1
-				respone.Round = round
 
 				val, err := json.Marshal(respone)
 				if err != nil {
@@ -196,6 +191,23 @@ func runGame(c *Client, msg []byte, roomId string) {
 				c.hub.broadcast <- []byte(val)
 				if round.Time == 0 {
 					ticker.Stop()
+
+                    round.Time = -1
+                    if round.Team == "red" {
+                        round.Team = "blue"
+                    } else {
+                        round.Team = "red"
+                    }
+
+                    notGuessedClues := []Clue{}
+                    for _, clue := range clues {
+                        if !clue.Guessed {
+                            notGuessedClues = append(notGuessedClues, clue)
+                        }
+                    }
+                    round.Clue = notGuessedClues[rand.Intn(len(notGuessedClues))]
+
+                    round.User
 				}
 			}
 		}()
@@ -203,7 +215,32 @@ func runGame(c *Client, msg []byte, roomId string) {
 
 	if message.Type == "send-guess" {
 		if message.Data == "correct" {
-			ticker.Stop()
+
+            for i, clue := range clues {
+                if clue.Id == round.Clue.Id {
+                    clues[i].Guessed = true
+                }
+            }
+
+            // update score
+            if round.Team == "red" {
+                score[len(score)-1].Team1Clues = append(score[len(score)-1].Team1Clues, round.Clue)
+            } else {
+                score[len(score)-1].Team2Clues = append(score[len(score)-1].Team2Clues, round.Clue)
+            }
+
+			round.User = round.NextUser
+			for i, user := range users {
+				if user.Id == round.User.Id {
+					if i == len(users)-1 {
+						round.NextUser = users[0]
+					} else {
+						round.NextUser = users[i+1]
+					}
+				}
+			}
+			round.Clue = clues[rand.Intn(len(clues))]
+
 		}
 
 	}
