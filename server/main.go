@@ -81,7 +81,7 @@ func main() {
 			go hub.run()
 			hubs[roomId] = hub
 		}
-		serveWs(hub, c.Writer, c.Request)
+		serveWs(hub, c.Writer, c.Request, roomId)
 	})
 
 	if err := router.Run(fmt.Sprintf("0.0.0.0:%v", PORT)); err != nil {

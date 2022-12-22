@@ -55,7 +55,7 @@ type Client struct {
 // The application runs readPump in a per-connection goroutine. The application
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
-func (c *Client) readPump() {
+func (c *Client) readPump(roomId string) {
 	defer func() {
 		c.hub.unregister <- c
 		c.conn.Close()
@@ -72,7 +72,7 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-        runGame(c, message)
+		runGame(c, message, roomId)
 	}
 }
 
@@ -123,15 +123,15 @@ func (c *Client) writePump() {
 }
 
 // serveWs handles websocket requests from the peer.
-func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, roomId string) {
 
-	upgrader.CheckOrigin = func(r *http.Request) bool { 
-        // TODO: check origin
-        if r.Header.Get("Origin") == "http://localhost:3000" {
-            return true
-        }
-        return false
-    }
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		// TODO: check origin
+		if r.Header.Get("Origin") == "http://localhost:3000" {
+			return true
+		}
+		return false
+	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -144,5 +144,5 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
 	go client.writePump()
-	go client.readPump()
+	go client.readPump(roomId)
 }

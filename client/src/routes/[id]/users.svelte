@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from "$app/stores";
+    import { userId } from "src/store";
     import type { User } from "src/types";
 
     export let conn: WebSocket;
@@ -8,30 +9,41 @@
     const id = $page.params.id;
     let nickname = "";
 
-    const onSubmit = () => {
-        if (conn) {
-            conn.send(
-                JSON.stringify({ type: "nickname", data: nickname, room: id })
-            );
-        }
+    const onCreateUser = () => {
+        const uuid = crypto.randomUUID();
+        const data = JSON.stringify({
+            id: uuid,
+            nickname,
+        });
+        const request = JSON.stringify({
+            type: "nickname",
+            data,
+            room: id,
+        });
+        userId.set(uuid);
+        conn.send(request);
     };
 
     const onReady = () => {
-        const userId = localStorage.getItem("userId");
-        if (conn && userId) {
-            conn.send(JSON.stringify({ type: "ready", data: userId }));
-        }
+        const request = JSON.stringify({
+            type: "ready",
+            data: $userId,
+            room: id,
+        });
+        conn.send(request);
     };
 
     const goToClues = () => {
-        const userId = localStorage.getItem("userId");
-        if (conn && userId) {
-            conn.send(JSON.stringify({ type: "clues", data: userId }));
-        }
+        const request = JSON.stringify({
+            type: "go-to-clues",
+            data: $userId,
+            room: id,
+        });
+        conn.send(request);
     };
 </script>
 
-<form id="form" on:submit|preventDefault={onSubmit}>
+<form id="form" on:submit|preventDefault={onCreateUser}>
     <input type="submit" value="Send" />
     <input type="text" bind:value={nickname} size="64" />
 </form>

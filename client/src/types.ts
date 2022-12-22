@@ -6,7 +6,6 @@ export type User = {
     step: number;
 };
 
-
 export type Room = {
     id: string;
     created: string;
@@ -14,5 +13,18 @@ export type Room = {
     deleted: string;
     name: string;
     password: string;
+}
+
+export type Clue = {
+    word: string;
+    type: string;
+}
+
+export type Round = {
+    team: string;
+    clue: Clue;
+    user: User;
+    nextUser: User;
+    time: number;
 }
 
