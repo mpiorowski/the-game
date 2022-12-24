@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { page } from "$app/stores";
-    import { Input } from "@mpiorowski/svelte-init";
-    import type { User } from "src/types";
+    import { page } from '$app/stores';
+    import { Input } from '@mpiorowski/svelte-init';
+    import type { User } from 'src/types';
 
     export let conn: WebSocket;
     export let users: User[] = [];
     export let user: User | null;
 
     const id = $page.params.id;
-    let nickname = "";
+    let nickname = '';
 
     const onCreateUser = () => {
         const uuid = crypto.randomUUID();
@@ -17,17 +17,17 @@
             nickname,
         });
         const request = JSON.stringify({
-            type: "nickname",
+            type: 'nickname',
             data,
             room: id,
         });
-        localStorage.setItem("userId", uuid);
+        localStorage.setItem('userId', uuid);
         conn.send(request);
     };
 
     const onReady = () => {
         const request = JSON.stringify({
-            type: "ready",
+            type: 'ready',
             data: user?.id,
             room: id,
         });
@@ -36,7 +36,7 @@
 
     const goToClues = () => {
         const request = JSON.stringify({
-            type: "go-to-clues",
+            type: 'go-to-clues',
             data: user?.id,
             room: id,
         });
@@ -44,30 +44,26 @@
     };
 </script>
 
-<div>
-    {#if !user?.id}
+{#if !user?.id}
+    <form id="nickname" class="w-full" on:submit|preventDefault={onCreateUser}>
         <Input type="text" label="Nickname" bind:value={nickname} />
-        <form id="form" on:submit|preventDefault={onCreateUser}>
-            <input type="text" bind:value={nickname} size="64" />
-            <input type="submit" value="Send" />
-        </form>
-    {:else if !user?.ready}
-        <form id="form" on:submit|preventDefault={onReady}>
-            <input type="submit" value="Ready" />
-        </form>
-    {:else if user.ready}
-        <form id="form" on:submit|preventDefault={goToClues}>
-            <input type="submit" value="Clues" />
-        </form>
-    {/if}
+    </form>
+{:else if !user?.ready}
+    <form id="form" on:submit|preventDefault={onReady}>
+        <input type="submit" value="Ready" />
+    </form>
+{:else if user.ready}
+    <form id="form" on:submit|preventDefault={goToClues}>
+        <input type="submit" value="Clues" />
+    </form>
+{/if}
 
-    {#each users as user}
-        <div
-            style="display: flex; gap: 4px; flex-direction: row; align-items: center;"
-        >
-            <div>Nickname: {user.nickname}</div>
-            <div>Team: {user.team}</div>
-            <div>Ready: {user.ready}</div>
-        </div>
-    {/each}
-</div>
+{#each users as user}
+    <div
+        style="display: flex; gap: 4px; flex-direction: row; align-items: center;"
+    >
+        <div>Nickname: {user.nickname}</div>
+        <div>Team: {user.team}</div>
+        <div>Ready: {user.ready}</div>
+    </div>
+{/each}

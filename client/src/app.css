@@ -2,44 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --btn-text: #ffffff;
-  --btn-primary: #006d75;
-  --btn-primary-hover: #08979c;
-  --btn-primary-focus: #13c2c2;
-  --btn-error: #a8071a;
-  --btn-error-hover: #cf1322;
-  --btn-error-focus: #f5222d;
-  --btn-ghost: #8c8c8c;
-  --btn-ghost-hover: #bfbfbf;
-  --btn-ghost-focus: #d9d9d9;
+@layer base {
+    body {
+        @apply bg-gray-50 text-gray-600;
+    }
+    h1 {
+        @apply text-4xl;
+    }
+    h2 {
+        @apply text-3xl;
+    }
+    h3 {
+        @apply text-2xl;
+    }
+}
 
-  --input-primary: #595959;
-  --input-focus: #bfbfbf;
-  --input-error: #f5222d;
-  --input-placeholder: #bfbfbf;
+@layer components {
+    .input {
+        @apply shadow transition bg-white border border-gray-300 hover:border-gray-400 focus:ring focus:ring-gray-200 placeholder-gray-300;
+    }
+    .input.error {
+        @apply border border-red-500 placeholder-red-500;
+    }
+    .text-error {
+        @apply text-red-500;
+    }
+    input[type="checkbox"], input[type="radio"] {
+        @apply accent-slate-600;
+    }
+    .button {
+        @apply shadow transition;
+    }
+    .button.primary {
+        @apply bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-600 focus:ring;
+    }
+    .button.error {
+        @apply bg-red-500 text-white hover:bg-red-600 focus:ring-red-600 focus:ring;
+    }
+    .button.ghost {
+        @apply bg-gray-200 text-gray-600 hover:bg-gray-300 focus:ring-gray-300 focus:ring;
+    }
+    .button.primary.link {
+        @apply text-blue-500 hover:underline hover:bg-white;
+    }
+    .button.error.link {
+        @apply text-red-500 hover:underline hover:bg-white;
+    }
+    .button.ghost.link {
+        @apply text-gray-600 hover:underline hover:bg-white;
+    }
+    .toast {
+        @apply shadow-md;
+    }
+    .toast.success {
+        @apply bg-green-500 text-white;
+    }
+    .toast.error {
+        @apply bg-red-500 text-white;
+    }
+    .toast.info {
+        @apply bg-blue-500 text-white;
+    }
+    .toast.warning {
+        @apply bg-yellow-500 text-white;
+    }
+    .drawer, .modal {
+        @apply shadow-md bg-gray-100;
+    }
+    .dropdown {
+        @apply shadow transition bg-white border border-gray-300;
+    }
+    .tooltip-text {
+        @apply shadow transition bg-gray-600 text-gray-200;
+    }
+}
 
-  --accent: #13c2c2;
-
-  --toast-text: #ffffff;
-  --toast-success: #237804;
-  --toast-error: #a8071a;
-  --toast-warning: #ad8b00;
-  --toast-info: #0050b3;
-  --toast-info-text: #ffffff;
-
-  --drawer-background: #434343;
-
-  --modal-background: #434343;
-
-  --table-header: #434343;
-  --table-body: #595959;
-  --table-footer: #434343;
-
-  --dropdown-background: #595959;
-
-  --tooltip-background: #595959;
-  --tooltip-text: #ffffff;
-
-  --shadow: 0 0 0 0px #fff, 0 0 0 0px #fff, 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+:focus {
+    outline: none;
+}
+.no-scroll {
+    overflow: hidden;
 }
