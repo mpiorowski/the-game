@@ -1,3 +1,8 @@
+export enum Teams {
+    A,
+    B
+}
+
 export type User = {
     id: string;
     nickname: string;
