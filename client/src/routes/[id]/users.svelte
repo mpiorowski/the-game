@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import { Input } from '@mpiorowski/svelte-init';
+    import { Button, Input } from '@mpiorowski/svelte-init';
     import type { User } from 'src/types';
 
     export let conn: WebSocket;
@@ -45,8 +45,13 @@
 </script>
 
 {#if !user?.id}
-    <form id="nickname" class="w-full" on:submit|preventDefault={onCreateUser}>
+    <form
+        id="nickname"
+        class="flex flex-col h-40"
+        on:submit|preventDefault={onCreateUser}
+    >
         <Input type="text" label="Nickname" bind:value={nickname} />
+        <Button type="ghost" form="nickname">Create user</Button>
     </form>
 {:else if !user?.ready}
     <form id="form" on:submit|preventDefault={onReady}>
@@ -58,12 +63,19 @@
     </form>
 {/if}
 
-{#each users as user}
-    <div
-        style="display: flex; gap: 4px; flex-direction: row; align-items: center;"
-    >
-        <div>Nickname: {user.nickname}</div>
-        <div>Team: {user.team}</div>
-        <div>Ready: {user.ready}</div>
-    </div>
-{/each}
+<div class="grid grid-cols-[1fr_auto_1fr] w-full justify-center justify-items-center text-lg">
+    <h3>Nickname</h3>
+    <h3>Team</h3>
+    <h3>Ready</h3>
+    {#each users as user}
+        <div>{user.nickname}</div>
+        <div>{user.team > -1 ? user.team : '-'}</div>
+        <div>
+            {#if user.ready}
+                <span class="text-green-800">✅</span>
+            {:else}
+                <span class="text-red-800">❌</span>
+            {/if}
+        </div>
+    {/each}
+</div>

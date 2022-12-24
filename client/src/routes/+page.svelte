@@ -25,7 +25,7 @@
     }
 </script>
 
-<form class="w-full" id="room" on:submit|preventDefault={joinRoom}>
+<form class="w-full h-full flex flex-col justify-center items-center" id="room" on:submit|preventDefault={joinRoom}>
     <h1>The Game</h1>
     <Input bind:value={room.name} label="Room name" />
     <Input bind:value={room.password} label="Room password" />

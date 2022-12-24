@@ -1,7 +1,7 @@
 export type User = {
     id: string;
     nickname: string;
-    team: string;
+    team: number;
     ready: boolean;
     step: number;
 };

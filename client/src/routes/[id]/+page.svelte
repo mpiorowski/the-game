@@ -6,6 +6,7 @@
     import Users from "./users.svelte";
     import Clues from "./clues.svelte";
     import Guesses from "./guesses.svelte";
+    import { Spinner } from "@mpiorowski/svelte-init";
 
     const id = $page.params.id;
     let users: User[] = [];
@@ -39,7 +40,7 @@
 </script>
 
 {#if isLoading}
-    <div>Loading...</div>
+    <Spinner center />
 {:else if user?.step === 1 || !user}
     <Users {conn} {users} {user} />
 {:else if user.step === 2}
