@@ -48,6 +48,10 @@ func correctGuess(ticker *time.Ticker, round *Round, users []User, clues []Clue,
 		round.Time = -1
 		round.Team = 1 - round.Team
 
+        for i := range users {
+            users[i].Step = 4
+        }
+
         newScore := Score{
             Game: round.Game,
             TeamClues: [][]Clue{{}, {}},
@@ -59,6 +63,7 @@ func correctGuess(ticker *time.Ticker, round *Round, users []User, clues []Clue,
         for i := range clues {
             clues[i].Guessed = false
         }
+
 
 		// change user
 		var usersFromTeam []User

@@ -2,16 +2,20 @@
     import { Config } from 'src/config';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
-    import type { Round, User } from 'src/types';
+    import type { Round, Score, User } from 'src/types';
     import Users from './users.svelte';
     import Clues from './clues.svelte';
     import Guesses from './guesses.svelte';
     import { Button, Spinner } from '@mpiorowski/svelte-init';
     import { goto } from '$app/navigation';
+    import Rounds from './rounds.svelte';
 
     const id = $page.params.id;
+
     let users: User[] = [];
     let round: Round | null = null;
+    let score: Score[] = [];
+
     let user: User | null = null;
     let conn: WebSocket;
     let isLoading = true;
@@ -19,6 +23,7 @@
     type Response = {
         users: User[];
         round: Round;
+        score: Score[];
     };
 
     onMount(async () => {
@@ -31,6 +36,7 @@
             const json = JSON.parse(evt.data) as Response;
             round = json.round;
             users = json.users || [];
+            score = json.score || [];
             user = users.find((u) => u.id === userId) || null;
             isLoading = false;
         };
@@ -53,6 +59,8 @@
         {:else if user.step === 2 || user.step === 3}
             <Clues {conn} {user} />
         {:else if user.step === 4 && round}
+            <Rounds {conn} {user} {round} score={score} />
+        {:else if user.step === 5 && round}
             <Guesses {conn} {user} {round} />
         {:else}
             <div>Something went wrong. Please refresh the page.</div>
