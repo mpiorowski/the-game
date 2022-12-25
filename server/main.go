@@ -14,9 +14,9 @@ import (
 )
 
 var (
-	DOMAIN  = utils.MustGetenv("DOMAIN")
-	PORT    = utils.MustGetenv("PORT")
-	ENV     = utils.MustGetenv("ENV")
+	DOMAIN = utils.MustGetenv("DOMAIN")
+	PORT   = utils.MustGetenv("PORT")
+	ENV    = utils.MustGetenv("ENV")
 )
 
 var hubs = make(map[string]*Hub)
@@ -28,13 +28,15 @@ func main() {
 	}
 	router := gin.Default()
 	router.MaxMultipartMemory = 8 << 20 // 8 MiB
-	url := "http://" + DOMAIN + ":3000"
+	url := "http://www." + DOMAIN + ":3000"
+	urlShort := "http://" + DOMAIN + ":3000"
 	if ENV == "production" {
 		url = "https://www." + DOMAIN
+		urlShort = "https://" + DOMAIN
 	}
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{url}
+	config.AllowOrigins = []string{url, urlShort}
 	config.AllowCredentials = true
 	config.AllowHeaders = []string{"Authorization", "Content-Type"}
 	router.Use(cors.New(config))
