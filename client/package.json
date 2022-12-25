@@ -28,7 +28,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@mpiorowski/svelte-init": "^1.8.0",
+		"@mpiorowski/svelte-init": "^2.0.4",
 		"zod": "^3.20.2"
 	}
 }

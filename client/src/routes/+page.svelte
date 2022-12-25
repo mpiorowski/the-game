@@ -1,18 +1,21 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import { useApi } from "src/@utils/api.util";
-    import type { Room } from "./room.type";
+    import { goto } from '$app/navigation';
+    import { Button, Input, toast, ToastType } from '@mpiorowski/svelte-init';
+    import { useApi } from 'src/@utils/api.util';
+    import type { Room } from 'src/types';
+    import { fade } from 'svelte/transition';
 
     let room = {
-        name: "Room 1",
-        password: "1234",
+        name: 'Room 1',
+        password: '1234',
     };
 
     const { request, response } = useApi<Room>();
     async function joinRoom() {
+        toast('Joining room...', ToastType.INFO, 2000);
         await request({
-            url: "/rooms",
-            method: "POST",
+            url: '/rooms',
+            method: 'POST',
             body: JSON.stringify(room),
         });
         response.subscribe((data) => {
@@ -23,9 +26,22 @@
     }
 </script>
 
-<h1>Create room</h1>
-<form on:submit|preventDefault={joinRoom}>
-    <input type="text" bind:value={room.name} />
-    <input type="password" bind:value={room.password} />
-    <button type="submit">Create</button>
+<form
+    in:fade
+    class="w-full h-full flex flex-col gap-2 justify-center items-center"
+    id="room"
+    on:submit|preventDefault={joinRoom}
+>
+    <h1 class="mb-6">The Game</h1>
+    <Input bind:value={room.name} label="Room name" />
+    <Input bind:value={room.password} label="Room password" />
+    <Button type="primary" form="room">Create or join room</Button>
+    <Button
+        type="ghost"
+        on:click={() => {
+            goto('/rules');
+        }}
+    >
+        Rules
+    </Button>
 </form>

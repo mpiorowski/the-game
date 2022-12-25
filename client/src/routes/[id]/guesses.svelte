@@ -1,15 +1,16 @@
 <script lang="ts">
-    import { page } from "$app/stores";
-    import type { Round, User } from "src/types";
+    import { page } from '$app/stores';
+    import { Button } from '@mpiorowski/svelte-init';
+    import { Teams, type Round, type User } from 'src/types';
 
     const id = $page.params.id;
     export let conn: WebSocket;
     export let user: User;
-    export let round: Round | null;
+    export let round: Round;
 
     const onStartRound = () => {
         const request = JSON.stringify({
-            type: "start-round",
+            type: 'start-round',
             data: user.id,
             room: id,
         });
@@ -20,8 +21,8 @@
         if (conn && round) {
             conn.send(
                 JSON.stringify({
-                    type: "send-guess",
-                    data: "correct",
+                    type: 'send-guess',
+                    data: 'correct',
                     room: id,
                     userId: user.id,
                 })
@@ -30,19 +31,45 @@
     };
 </script>
 
-{#if user.step === 3}
-    <h1>Waiting for other players to submit clues</h1>
-{/if}
-{#if user.step === 4 && round}
-    <h1>Guesses</h1>
-    <h2>
-        Game: {round.game}
-        Team: {round.team}
-    </h2>
-    {#if round.user.id === user.id && round.time === -1}
-        <h2>Start Timer</h2>
-        <button on:click={onStartRound}>Start round</button>
-    {/if}
+{#if round.time === -1}
+    <div class="text-center flex flex-col gap-6">
+        {#if round.game === 0}
+            <h2>Round 1 - Taboo</h2>
+            <h3>
+                The first round is a Taboo game, You need to explain given
+                sentence without using any of the words it contains.
+            </h3>
+        {:else if round.game === 1}
+            <h2>Round 2 - Charades</h2>
+            <h3>
+                The second round is a Charades game, You need to explain given
+                sentence without using any words.
+            </h3>
+        {:else if round.game === 2}
+            <h2>Round 3 - Stone</h2>
+            <h3>
+                The third and final round is a little different. You look at
+                Your sentence, <b>REMEMBER IT</b>
+                , and then
+                <b>SAY ONE WORD</b>
+                (not included in the sentence). After that You turn
+                <b>INTO STONE</b>
+                , no move, no mimick, nothing, not until Your team says the FULL,
+                CORRECT sentence. If you at any point as much as blink, timer stops,
+                and next time starts.
+            </h3>
+        {/if}
+        {#if round.user.id === user.id}
+            <Button on:click={onStartRound}>Start round!</Button>
+        {:else}
+            <h3>
+                Starting person is <b>{round.user.nickname}</b>
+                from team
+                <b>{Teams[round.team]}</b>
+            </h3>
+        {/if}
+    </div>
+{:else}
     {#if round.user.id === user.id && round.time > 0}
         <h2>It's your turn</h2>
         <h3>

@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { page } from "$app/stores";
-    import { Input } from "@mpiorowski/svelte-init";
-    import type { User } from "src/types";
+    import { page } from '$app/stores';
+    import { Button, Input } from '@mpiorowski/svelte-init';
+    import { Teams, type User } from 'src/types';
 
     export let conn: WebSocket;
     export let users: User[] = [];
     export let user: User | null;
 
     const id = $page.params.id;
-    let nickname = "";
+    let nickname = '';
 
     const onCreateUser = () => {
         const uuid = crypto.randomUUID();
@@ -17,26 +17,26 @@
             nickname,
         });
         const request = JSON.stringify({
-            type: "nickname",
+            type: 'nickname',
             data,
             room: id,
         });
-        localStorage.setItem("userId", uuid);
+        localStorage.setItem('userId', uuid);
         conn.send(request);
     };
 
     const onReady = () => {
         const request = JSON.stringify({
-            type: "ready",
+            type: 'ready',
             data: user?.id,
             room: id,
         });
         conn.send(request);
     };
 
-    const goToClues = () => {
+    const onGoToClues = () => {
         const request = JSON.stringify({
-            type: "go-to-clues",
+            type: 'go-to-clues',
             data: user?.id,
             room: id,
         });
@@ -44,30 +44,61 @@
     };
 </script>
 
-<div>
+<div
+    class="flex flex-col h-40 justify-center items-center border-b border-gray-300 mb-8"
+>
     {#if !user?.id}
-        <Input type="text" label="Nickname" bind:value={nickname} />
-        <form id="form" on:submit|preventDefault={onCreateUser}>
-            <input type="text" bind:value={nickname} size="64" />
-            <input type="submit" value="Send" />
+        <form
+            id="nickname"
+            class="w-full"
+            on:submit|preventDefault={onCreateUser}
+        >
+            <Input type="text" label="Nickname" bind:value={nickname} />
+            <Button type="ghost" form="nickname">Create user</Button>
         </form>
+    {:else if users.length < 4}
+        <h2 class="text-center">Waiting for other players to join...</h2>
     {:else if !user?.ready}
-        <form id="form" on:submit|preventDefault={onReady}>
-            <input type="submit" value="Ready" />
+        <form id="ready" class="w-full" on:submit|preventDefault={onReady}>
+            <h2 class="text-center mb-4">
+                {user?.nickname}, are you ready to play the best social game
+                ever?
+            </h2>
+            <Button type="primary" form="ready">I am ready!</Button>
         </form>
+    {:else if users.some((u) => !u.ready)}
+        <h2 class="text-center">Waiting for other players to be ready...</h2>
     {:else if user.ready}
-        <form id="form" on:submit|preventDefault={goToClues}>
-            <input type="submit" value="Clues" />
+        <form id="clues" class="w-full" on:submit|preventDefault={onGoToClues}>
+            <h2 class="text-center mb-4">
+                {user?.nickname}, you are on team
+                <span class="font-bold">
+                    {Teams[user?.team]}
+                </span>.
+                <br />
+                Let's the game begin!
+            </h2>
+
+            <Button type="primary" form="clues">Start the fun</Button>
         </form>
     {/if}
+</div>
 
-    {#each users as user}
-        <div
-            style="display: flex; gap: 4px; flex-direction: row; align-items: center;"
-        >
-            <div>Nickname: {user.nickname}</div>
-            <div>Team: {user.team}</div>
-            <div>Ready: {user.ready}</div>
+<div
+    class="grid grid-cols-[1fr_auto_1fr] w-full justify-center justify-items-center text-lg"
+>
+    <h3>Nickname</h3>
+    <h3>Team</h3>
+    <h3>Ready</h3>
+    {#each users.sort((a, b) => a.team - b.team) as user}
+        <div class="font-bold">{user.nickname}</div>
+        <div class="font-bold">{user.team > -1 ? Teams[user.team] : '-'}</div>
+        <div>
+            {#if user.ready}
+                <span class="text-green-800">&#10004;</span>
+            {:else}
+                <span class="text-red-800">&#x2717;</span>
+            {/if}
         </div>
     {/each}
 </div>

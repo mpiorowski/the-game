@@ -1,7 +1,12 @@
+export enum Teams {
+    A,
+    B
+}
+
 export type User = {
     id: string;
     nickname: string;
-    team: string;
+    team: number;
     ready: boolean;
     step: number;
 };
@@ -24,7 +29,7 @@ export type Clue = {
 
 export type Round = {
     game: number;
-    team: string;
+    team: number;
     clue: Clue;
     user: User;
     nextUser: User;
