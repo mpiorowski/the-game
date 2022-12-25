@@ -45,14 +45,14 @@
 </script>
 
 <div class="h-full grid grid-rows-[1fr_auto]">
-    <div class="overflow-auto mb-4 px-5">
+    <div class="overflow-auto mb-4">
         {#if isLoading}
             <Spinner center />
         {:else if user?.step === 1 || !user}
             <Users {conn} {users} {user} />
-        {:else if user.step === 2}
+        {:else if user.step === 2 || user.step === 3}
             <Clues {conn} {user} />
-        {:else if user.step === 3 || user.step === 4}
+        {:else if user.step === 4 && round}
             <Guesses {conn} {user} {round} />
         {:else}
             <div>Something went wrong. Please refresh the page.</div>

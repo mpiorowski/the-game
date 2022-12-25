@@ -29,7 +29,7 @@ export type Clue = {
 
 export type Round = {
     game: number;
-    team: string;
+    team: number;
     clue: Clue;
     user: User;
     nextUser: User;
