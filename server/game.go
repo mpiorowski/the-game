@@ -20,6 +20,7 @@ type Response struct {
 	Users []User  `json:"users"`
 	Round Round   `json:"round"`
 	Score []Score `json:"score"`
+	Clues []Clue  `json:"clues"`
 }
 
 type Team struct {
@@ -38,7 +39,7 @@ type User struct {
 
 type Clue struct {
 	Id      string `json:"id"`
-    UserId  string `json:"userId"`
+	UserId  string `json:"userId"`
 	Word    string `json:"word"`
 	Type    string `json:"type"`
 	Guessed bool   `json:"guessed"`
@@ -183,7 +184,6 @@ func runGame(c *Client, msg []byte, roomId string) {
 			round.User = usersFromTeam[0]
 			round.NextUser = usersFromTeam[1]
 
-
 			playerPerTeam = []int{0, 0}
 		}
 
@@ -191,9 +191,9 @@ func runGame(c *Client, msg []byte, roomId string) {
 
 	if message.Type == "start-round" {
 		round.Time = 60
-        for i := range users {
-            users[i].Step = 5
-        }
+		for i := range users {
+			users[i].Step = 5
+		}
 		ticker = time.NewTicker(time.Second)
 		go tickRound(roomId, ticker, *c)
 	}
@@ -201,15 +201,18 @@ func runGame(c *Client, msg []byte, roomId string) {
 	if message.Type == "send-guess" {
 		if message.Data == "correct" {
 			correctGuess(ticker, &round, users, clues, &score, playerPerTeam)
+		} else if message.Data == "incorrect" {
+			endRound(ticker, &round, users, clues, playerPerTeam)
 		}
-		// TODO - error
-
 	}
 
 	var response Response
 	response.Users = users
 	response.Round = round
 	response.Score = score
+	if round.Game == 3 {
+		response.Clues = clues
+	}
 
 	val, err := json.Marshal(response)
 	if err != nil {

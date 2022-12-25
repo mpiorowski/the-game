@@ -19,16 +19,24 @@
     };
 
     const onSendGuess = () => {
-        if (conn && round) {
-            conn.send(
-                JSON.stringify({
-                    type: 'send-guess',
-                    data: 'correct',
-                    room: id,
-                    userId: user.id,
-                })
-            );
-        }
+        conn.send(
+            JSON.stringify({
+                type: 'send-guess',
+                data: 'correct',
+                room: id,
+                userId: user.id,
+            })
+        );
+    };
+    const onSendWrongGuess = () => {
+        conn.send(
+            JSON.stringify({
+                type: 'send-guess',
+                data: 'incorrect',
+                room: id,
+                userId: user.id,
+            })
+        );
     };
 </script>
 
@@ -59,5 +67,10 @@
     {/if}
     {#if round.nextUser.id === user.id}
         <h2 class="font-bold">You're next!</h2>
+    {/if}
+    {#if round.user.team !== user.team && round.time > -1}
+        <Button type="error" on:click={onSendWrongGuess}>
+            Incorrect!
+        </Button>
     {/if}
 </div>
