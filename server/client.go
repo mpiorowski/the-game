@@ -128,7 +128,7 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, roomId string) {
 	upgrader.CheckOrigin = func(r *http.Request) bool {
 		url := "http://" + DOMAIN + ":3000"
 		if ENV == "production" {
-			url = "https://www." + DOMAIN
+			url = "https://" + DOMAIN
 		}
 		if r.Header.Get("Origin") == url {
 			return true
