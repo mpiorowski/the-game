@@ -45,25 +45,33 @@ func correctGuess(ticker *time.Ticker, round *Round, users []User, clues []Clue,
 	if len(notGuessedClues) == 0 {
 		ticker.Stop()
 		round.Game = round.Game + 1
+
+		// Finish game
+		if round.Game == 3 {
+			for i := range users {
+				users[i].Step = 6
+			}
+			return
+		} else {
+			for i := range users {
+				users[i].Step = 4
+			}
+		}
+
 		round.Time = -1
 		round.Team = 1 - round.Team
 
-        for i := range users {
-            users[i].Step = 4
-        }
-
-        newScore := Score{
-            Game: round.Game,
-            TeamClues: [][]Clue{{}, {}},
-        }
+		newScore := Score{
+			Game:      round.Game,
+			TeamClues: [][]Clue{{}, {}},
+		}
 
 		*score = append(*score, newScore)
 
-        // make all clues available again
-        for i := range clues {
-            clues[i].Guessed = false
-        }
-
+		// make all clues available again
+		for i := range clues {
+			clues[i].Guessed = false
+		}
 
 		// change user
 		var usersFromTeam []User
@@ -76,6 +84,33 @@ func correctGuess(ticker *time.Ticker, round *Round, users []User, clues []Clue,
 		round.NextUser = usersFromTeam[(playerPerTeam[round.Team]+1)%len(usersFromTeam)]
 	}
 
+}
+
+func endRound(ticker *time.Ticker, round *Round, users []User, clues []Clue, playerPerTeam []int) {
+	ticker.Stop()
+
+	// change team
+	round.Time = -1
+	round.Team = 1 - round.Team
+
+	// change user
+	var usersFromTeam []User
+	for _, user := range users {
+		if user.Team == round.Team {
+			usersFromTeam = append(usersFromTeam, user)
+		}
+	}
+	round.User = usersFromTeam[playerPerTeam[round.Team]]
+	round.NextUser = usersFromTeam[(playerPerTeam[round.Team]+1)%len(usersFromTeam)]
+
+	// assign new clue
+	notGuessedClues := []Clue{}
+	for _, clue := range clues {
+		if !clue.Guessed {
+			notGuessedClues = append(notGuessedClues, clue)
+		}
+	}
+	round.Clue = notGuessedClues[rand.Intn(len(notGuessedClues))]
 }
 
 func tickRound(roomId string, ticker *time.Ticker, c Client) {
@@ -93,30 +128,7 @@ func tickRound(roomId string, ticker *time.Ticker, c Client) {
 		 * End round
 		 */
 		if round.Time == 0 {
-			ticker.Stop()
-
-			// change team
-			round.Time = -1
-			round.Team = 1 - round.Team
-
-			// change user
-			var usersFromTeam []User
-			for _, user := range users {
-				if user.Team == round.Team {
-					usersFromTeam = append(usersFromTeam, user)
-				}
-			}
-			round.User = usersFromTeam[playerPerTeam[round.Team]]
-			round.NextUser = usersFromTeam[(playerPerTeam[round.Team]+1)%len(usersFromTeam)]
-
-			// assign new clue
-			notGuessedClues := []Clue{}
-			for _, clue := range clues {
-				if !clue.Guessed {
-					notGuessedClues = append(notGuessedClues, clue)
-				}
-			}
-			round.Clue = notGuessedClues[rand.Intn(len(notGuessedClues))]
+            endRound(ticker, &round, users, clues, playerPerTeam)
 		}
 		var response Response
 		response.Users = users

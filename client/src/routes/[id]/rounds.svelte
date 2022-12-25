@@ -55,7 +55,7 @@
         {/if}
         {#if round.user.id === user.id}
             <h2 class="font-bold">It's Your turn!</h2>
-            <Button on:click={onStartRound}>Start Your team turn!</Button>
+            <Button on:click={onStartRound}>Start Your team turn</Button>
         {:else}
             <h3>
                 Starting person is <b>{round.user.nickname}</b>
