@@ -190,7 +190,10 @@ func runGame(c *Client, msg []byte, roomId string) {
 	}
 
 	if message.Type == "start-round" {
-		round.Time = 10
+		round.Time = 60
+        for i := range users {
+            users[i].Step = 5
+        }
 		ticker = time.NewTicker(time.Second)
 		go tickRound(roomId, ticker, *c)
 	}

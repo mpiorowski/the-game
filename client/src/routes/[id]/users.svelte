@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { Button, Input } from '@mpiorowski/svelte-init';
-    import { Teams, type User } from 'src/types';
+    import { Team, type User } from 'src/types';
 
     export let conn: WebSocket;
     export let users: User[] = [];
@@ -73,7 +73,7 @@
             <h2 class="text-center mb-4">
                 {user?.nickname}, you are on team
                 <span class="font-bold">
-                    {Teams[user?.team]}
+                    {Team[user?.team]}
                 </span>.
                 <br />
                 Let's the game begin!
@@ -92,7 +92,7 @@
     <h3>Ready</h3>
     {#each users.sort((a, b) => a.team - b.team) as user}
         <div class="font-bold">{user.nickname}</div>
-        <div class="font-bold">{user.team > -1 ? Teams[user.team] : '-'}</div>
+        <div class="font-bold">{user.team > -1 ? Team[user.team] : '-'}</div>
         <div>
             {#if user.ready}
                 <span class="text-green-800">&#10004;</span>

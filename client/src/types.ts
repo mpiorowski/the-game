@@ -1,6 +1,12 @@
-export enum Teams {
+export enum Team {
     A,
     B
+}
+
+export enum Catergory {
+    Person = "person",
+    Place = "place",
+    Movie = "movie"
 }
 
 export type User = {
@@ -36,3 +42,7 @@ export type Round = {
     time: number;
 }
 
+export type Score = {
+    game: number;
+    teamClues: [Clue[], Clue[]];
+};

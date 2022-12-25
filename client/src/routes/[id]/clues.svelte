@@ -80,7 +80,7 @@
 </script>
 
 {#if user.step === 2}
-    <form on:submit|preventDefault={onSendClues} id="send-clues" class="mb-8">
+    <form on:submit|preventDefault={onSendClues} id="send-clues" class="mb-8 px-6">
         <CluesRules />
         <Input
             type="text"
