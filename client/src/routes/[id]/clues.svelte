@@ -1,4 +1,5 @@
 <script lang="ts">
+    import CluesRules from './clues.rules.svelte';
     import { page } from '$app/stores';
     import { Button, Input } from '@mpiorowski/svelte-init';
     import type { Clue, User } from 'src/types';
@@ -59,11 +60,13 @@
     }
 </script>
 
-<form on:submit|preventDefault={onSendClues}>
-    <h2 class="text-center mb-6">Enter your guess words</h2>
+<form on:submit|preventDefault={onSendClues} class="mb-8">
+    <CluesRules />
     <Input
         type="text"
-        label="Movie / TV Show / Book / etc."
+        label={'Movie / TV Show / Book / etc. (' +
+            movieClue.word.split(' ').length +
+            '/5)'}
         error={movieError}
         bind:value={movieClue.word}
     />

@@ -45,7 +45,7 @@
 </script>
 
 <div class="h-full grid grid-rows-[1fr_auto]">
-    <div>
+    <div class="overflow-auto mb-4 px-5">
         {#if isLoading}
             <Spinner center />
         {:else if user?.step === 1 || !user}

@@ -66,18 +66,20 @@
             </h2>
             <Button type="primary" form="ready">I am ready!</Button>
         </form>
+    {:else if users.some((u) => !u.ready)}
+        <h2 class="text-center">Waiting for other players to be ready...</h2>
     {:else if user.ready}
         <form id="clues" class="w-full" on:submit|preventDefault={onGoToClues}>
             <h2 class="text-center mb-4">
                 {user?.nickname}, you are on team
                 <span class="font-bold">
                     {Teams[user?.team]}
-                </span>
+                </span>.
                 <br />
                 Let's the game begin!
             </h2>
 
-            <Button type="primary" form="clues">Go to clues</Button>
+            <Button type="primary" form="clues">Start the fun</Button>
         </form>
     {/if}
 </div>
@@ -93,7 +95,7 @@
         <div class="font-bold">{user.team > -1 ? Teams[user.team] : '-'}</div>
         <div>
             {#if user.ready}
-                <span class="text-green-800 text-2xl">&#10004;</span>
+                <span class="text-green-800">&#10004;</span>
             {:else}
                 <span class="text-red-800">&#x2717;</span>
             {/if}
