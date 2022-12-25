@@ -10,9 +10,8 @@
         password: '1234',
     };
 
-    const { request, response } = useApi<Room>();
+    const { request, response, error } = useApi<Room>();
     async function joinRoom() {
-        toast('Joining room...', ToastType.INFO, 2000);
         await request({
             url: '/rooms',
             method: 'POST',
@@ -20,9 +19,13 @@
         });
         response.subscribe((data) => {
             if (data?.id) {
+                toast('Joining room...', ToastType.INFO, 2000);
                 goto(`/${data.id}`);
             }
         });
+    }
+    $: if ($error) {
+        toast(String($error), ToastType.ERROR);
     }
 </script>
 

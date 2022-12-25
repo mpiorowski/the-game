@@ -1,24 +1,24 @@
 package main
 
 import (
-	"database/sql"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Room struct {
-	Id       string  `json:"id"`
-	Created  string  `json:"created"`
-	Updated  string  `json:"updated"`
-	Deleted  *string `json:"deleted"`
-	Name     string  `json:"name"`
-	Password string  `json:"password"`
+	Id       string `json:"id"`
+	Created  string `json:"created"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }
+
+var rooms = make(map[string]*Room)
 
 func joinRoom(c *gin.Context) {
 	var request Room
-	var response Room
 
 	err := c.BindJSON(&request)
 	if err != nil {
@@ -26,45 +26,38 @@ func joinRoom(c *gin.Context) {
 		return
 	}
 
-	row := db.QueryRow("SELECT id, created, updated, deleted, name, password FROM rooms WHERE name = $1", request.Name)
-	err = row.Scan(&response.Id, &response.Created, &response.Updated, &response.Deleted, &response.Name, &response.Password)
-
-	if err != nil && err != sql.ErrNoRows {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	if err == nil {
-		compareErr := bcrypt.CompareHashAndPassword([]byte(response.Password), []byte(request.Password))
+	// Check if room exists
+    var room *Room
+    for _, r := range rooms {
+        if r.Name == request.Name {
+            room = r
+        }
+    }
+	if room != nil {
+		compareErr := bcrypt.CompareHashAndPassword([]byte(room.Password), []byte(request.Password))
 		if compareErr != nil {
-			c.JSON(401, gin.H{"error": "Invalid password"})
+			c.JSON(404, gin.H{"error": "Invalid password"})
 			return
 		} else {
-			c.JSON(200, response)
-			return
+			c.JSON(200, room)
 		}
 	}
 
-	if err == sql.ErrNoRows {
+	if room == nil {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
-		if err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
-			return
-		}
-		row := db.QueryRow("INSERT INTO rooms (name, password) VALUES ($1, $2) RETURNING *", request.Name, hashedPassword)
-		err = row.Scan(
-			&response.Id,
-			&response.Created,
-			&response.Updated,
-			&response.Deleted,
-			&response.Name,
-			&response.Password,
-		)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
+		room = &Room{
+			Id:       uuid.New().String(),
+			Created:  time.Now().Format("2006-01-02 15:04:05"),
+			Name:     request.Name,
+			Password: string(hashedPassword),
+		}
+		rooms[room.Id] = room
+		c.JSON(200, room)
 	}
 
-	c.JSON(200, response)
+
 }
