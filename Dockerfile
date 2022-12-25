@@ -7,7 +7,7 @@ COPY ./server/go.mod ./
 RUN go mod download && go mod verify
 
 COPY ./server ./
-RUN go build -v -o /usr/local/bin ./...
+RUN go build -v -o /usr/local/bin/app ./...
 
-CMD ["server"]
+CMD ["app"]
 
