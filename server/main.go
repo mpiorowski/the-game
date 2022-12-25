@@ -5,54 +5,21 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	utils "github.com/mpiorowski/golang"
-	migrate "github.com/rubenv/sql-migrate"
 )
 
 var (
 	DOMAIN  = utils.MustGetenv("DOMAIN")
 	PORT    = utils.MustGetenv("PORT")
 	ENV     = utils.MustGetenv("ENV")
-	DB_USER = utils.MustGetenv("DB_USER")
-	DB_PASS = utils.MustGetenv("DB_PASS")
-	DB_HOST = utils.MustGetenv("DB_HOST")
-	DB_NAME = utils.MustGetenv("DB_NAME")
 )
 
 var hubs = make(map[string]*Hub)
-var db *sql.DB
-
-func init() {
-	// Db connection
-	var err error
-	dbURI := fmt.Sprintf("user=%s password=%s database=%s host=%s",
-		DB_USER, DB_PASS, DB_NAME, DB_HOST)
-	if db, err = sql.Open("pgx", dbURI); err != nil {
-		log.Fatal(err)
-	}
-	pingErr := db.Ping()
-	if pingErr != nil {
-		log.Fatal(pingErr)
-	}
-	log.Println("Connected to database")
-
-	// Migrations
-	migrations := &migrate.FileMigrationSource{
-		Dir: "./migrations",
-	}
-	n, err := migrate.Exec(db, "postgres", migrations, migrate.Up)
-	if err != nil {
-		log.Fatalf("Migrations failed: %v", err)
-	}
-	log.Printf("Applied %d migrations", n)
-}
 
 func main() {
 	log.Println("Starting server...")

@@ -28,10 +28,6 @@ services:
       ENV: development
       DOMAIN: localhost
       PORT: 7000
-      DB_USER: postgres
-      DB_PASS: 12345
-      DB_HOST: db
-      DB_NAME: game
 
   db:
     container_name: game-db
