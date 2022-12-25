@@ -126,8 +126,11 @@ func (c *Client) writePump() {
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, roomId string) {
 
 	upgrader.CheckOrigin = func(r *http.Request) bool {
-		// TODO: check origin
-		if r.Header.Get("Origin") == "http://localhost:3000" {
+		url := "http://" + DOMAIN + ":3000"
+		if ENV == "production" {
+			url = "https://www." + DOMAIN
+		}
+		if r.Header.Get("Origin") == url {
 			return true
 		}
 		return false

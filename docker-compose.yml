@@ -8,10 +8,8 @@ services:
       - ./client:/client
     command: npm run dev
     environment:
-      VITE_DOMAIN_URL: http://localhost:3000
       VITE_API_URL: http://localhost:7000
       VITE_WS_URL: ws://localhost:7000
-      VITE_NODE_ENV: development
     ports: 
       - 3000:3000
 
