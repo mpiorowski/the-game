@@ -80,7 +80,11 @@
 </script>
 
 {#if user.step === 2}
-    <form on:submit|preventDefault={onSendClues} id="send-clues" class="mb-8 px-6">
+    <form
+        on:submit|preventDefault={onSendClues}
+        id="send-clues"
+        class="mb-8 px-6"
+    >
         <CluesRules />
         <Input
             type="text"
@@ -102,7 +106,9 @@
             bind:value={placeClue.word}
             error={placeError}
         />
-        <Button type="ghost" form="send-clues">Send clues</Button>
+        <div class="mt-4">
+            <Button type="primary" form="send-clues">Send clues</Button>
+        </div>
     </form>
 {/if}
 {#if user.step === 3}

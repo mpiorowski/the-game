@@ -2,7 +2,13 @@
     import { Config } from 'src/config';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
-    import type { Clue, Round, Score, User } from 'src/types';
+    import {
+        Team,
+        type Clue,
+        type Round,
+        type Score,
+        type User,
+    } from 'src/types';
     import Users from './users.svelte';
     import Clues from './clues.svelte';
     import Guesses from './guesses.svelte';
@@ -55,7 +61,7 @@
 </script>
 
 <div class="h-full grid grid-rows-[1fr_auto]">
-    <div class="overflow-auto mb-4">
+    <div class="overflow-auto mb-2">
         {#if isLoading}
             <Spinner center />
         {:else if user?.step === 1 || !user}
@@ -73,5 +79,14 @@
         {/if}
     </div>
 
+    {#if user?.id}
+        <div class="flex gap-1 justify-center mb-1">
+            You are <b>{user.nickname}</b>
+            {#if user.team >= 0}
+                in team
+                <b>{Team[user.team]}</b>
+            {/if}
+        </div>
+    {/if}
     <Button on:click={onReset}>Go back to rooms</Button>
 </div>
