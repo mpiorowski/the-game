@@ -26,12 +26,16 @@
             It's a tie!
         {/if}
     </h1>
+    <h3 class="mb-4">
+        Want to play again? Just go to rooms and crate a new one. Hope You have
+        fun! :)
+    </h3>
     <Scoring {score} />
     <h3 class="mt-6">Guess words</h3>
     {#each users as user}
         <div>
             <h4 class="font-bold">{user.nickname}</h4>
-            <ul class="list-decimal list-inside"> 
+            <ul class="list-decimal list-inside">
                 {#each clues.filter((el) => el.userId === user.id) as clue}
                     <li class="text-center">{clue.word}</li>
                 {/each}

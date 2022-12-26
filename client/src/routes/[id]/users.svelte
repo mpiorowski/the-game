@@ -1,7 +1,8 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import { Button, Input } from '@mpiorowski/svelte-init';
+    import { Button, Input, toast, ToastType } from '@mpiorowski/svelte-init';
     import { Team, type User } from 'src/types';
+    import { z } from 'zod';
 
     export let conn: WebSocket;
     export let users: User[] = [];
@@ -11,6 +12,15 @@
     let nickname = '';
 
     const onCreateUser = () => {
+        const validation = z.object({
+            nickname: z.string().min(1),
+        }).safeParse({ nickname }).success;
+
+        if (!validation) {
+            toast('Invalid nickname', ToastType.ERROR);
+            return;
+        }
+
         const uuid = crypto.randomUUID();
         const data = JSON.stringify({
             id: uuid,
@@ -54,7 +64,7 @@
             on:submit|preventDefault={onCreateUser}
         >
             <Input type="text" label="Nickname" bind:value={nickname} />
-            <Button type="ghost" form="nickname">Create user</Button>
+            <Button type="primary" form="nickname">Create user</Button>
         </form>
     {:else if users.length < 4}
         <h2 class="text-center">Waiting for other players to join...</h2>
@@ -74,7 +84,8 @@
                 {user?.nickname}, you are on team
                 <span class="font-bold">
                     {Team[user?.team]}
-                </span>.
+                </span>
+                .
                 <br />
                 Let's the game begin!
             </h2>
