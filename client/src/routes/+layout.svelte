@@ -5,6 +5,6 @@
 </script>
 
 <Toast />
-<div class="max-w-xl m-auto px-4 pt-8 pb-4 h-full fixed w-screen">
+<div class="max-w-xl px-4 pt-8 pb-4 h-full fixed w-screen left-1/2 -translate-x-1/2 ">
     <slot />
 </div>
