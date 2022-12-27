@@ -6,8 +6,8 @@
     import { fade } from 'svelte/transition';
 
     let room = {
-        name: 'Room 1',
-        password: '1234',
+        name: '',
+        password: '',
     };
 
     const { request, response, error } = useApi<Room>();

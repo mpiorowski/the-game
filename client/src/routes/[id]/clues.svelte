@@ -11,20 +11,20 @@
 
     let movieClue: Clue = {
         userId: user.id,
-        word: 'movieClue',
-        type: 'movie',
+        word: '',
+        type: '',
         guessed: false,
     };
     let personClue: Clue = {
         userId: user.id,
-        word: 'personClue',
-        type: 'person',
+        word: '',
+        type: '',
         guessed: false,
     };
     let placeClue: Clue = {
         userId: user.id,
-        word: 'placeClue',
-        type: 'place',
+        word: '',
+        type: '',
         guessed: false,
     };
 
