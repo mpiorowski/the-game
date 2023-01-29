@@ -16,6 +16,7 @@
     import { goto } from '$app/navigation';
     import Rounds from './rounds.svelte';
     import End from './end.svelte';
+    import { fade } from 'svelte/transition';
 
     const id = $page.params.id;
 
@@ -60,7 +61,7 @@
     };
 </script>
 
-<div class="h-full grid grid-rows-[1fr_auto]">
+<div class="h-full grid grid-rows-[1fr_auto]" in:fade>
     <div class="overflow-auto mb-2">
         {#if isLoading}
             <Spinner center />

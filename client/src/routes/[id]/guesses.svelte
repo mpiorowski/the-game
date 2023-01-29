@@ -3,6 +3,7 @@
     import { Button } from '@mpiorowski/svelte-init';
     import ProgressCircle from 'src/@components/progressCircle.svelte';
     import type { Round, User } from 'src/types';
+    import { fade } from 'svelte/transition';
 
     const id = $page.params.id;
     export let conn: WebSocket;
@@ -40,7 +41,7 @@
     };
 </script>
 
-<div class="text-center flex flex-col items-center gap-6">
+<div class="text-center flex flex-col items-center gap-6" in:fade>
     <ProgressCircle
         size={200}
         progress={round.time === -1 ? 0 : 60 - round.time}

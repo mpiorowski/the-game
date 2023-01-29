@@ -2,6 +2,7 @@
     import { page } from '$app/stores';
     import { Button, Input, toast, ToastType } from '@mpiorowski/svelte-init';
     import { Team, type User } from 'src/types';
+    import { fade } from 'svelte/transition';
     import { z } from 'zod';
 
     export let conn: WebSocket;
@@ -56,6 +57,7 @@
 
 <div
     class="flex flex-col h-40 justify-center items-center border-b border-gray-300 mb-8"
+    in:fade
 >
     {#if !user?.id}
         <form

@@ -9,10 +9,10 @@ import (
 )
 
 type Room struct {
-	Id       string `json:"id"`
-	Created  string `json:"created"`
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	Id       string    `json:"id"`
+	Created  time.Time `json:"created"`
+	Name     string    `json:"name"`
+	Password string    `json:"password"`
 }
 
 var rooms = make(map[string]*Room)
@@ -27,12 +27,12 @@ func joinRoom(c *gin.Context) {
 	}
 
 	// Check if room exists
-    var room *Room
-    for _, r := range rooms {
-        if r.Name == request.Name {
-            room = r
-        }
-    }
+	var room *Room
+	for _, r := range rooms {
+		if r.Name == request.Name {
+			room = r
+		}
+	}
 	if room != nil {
 		compareErr := bcrypt.CompareHashAndPassword([]byte(room.Password), []byte(request.Password))
 		if compareErr != nil {
@@ -51,13 +51,12 @@ func joinRoom(c *gin.Context) {
 		}
 		room = &Room{
 			Id:       uuid.New().String(),
-			Created:  time.Now().Format("2006-01-02 15:04:05"),
+			Created:  time.Now(),
 			Name:     request.Name,
 			Password: string(hashedPassword),
 		}
 		rooms[room.Id] = room
 		c.JSON(200, room)
 	}
-
 
 }

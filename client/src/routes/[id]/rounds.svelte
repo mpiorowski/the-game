@@ -3,6 +3,7 @@
     import { page } from '$app/stores';
     import { Team, type Round, type Score, type User } from 'src/types';
     import Scoring from './scoring.svelte';
+    import { fade } from 'svelte/transition';
 
     const id = $page.params.id;
     export let conn: WebSocket;
@@ -20,7 +21,7 @@
     };
 </script>
 
-<div class="grid grid-rows-[1fr_auto] h-full">
+<div class="grid grid-rows-[1fr_auto] h-full" in:fade>
     <div class="text-center flex flex-col gap-6">
         {#if round.game === 0}
             <h2>Round 1 - Taboo</h2>

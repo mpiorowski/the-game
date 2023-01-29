@@ -94,6 +94,13 @@ func runGame(c *Client, msg []byte, roomId string) {
 			return
 		}
 
+        // Check if the game has already started
+        for _, user := range users {
+            if user.Team != -1 {
+                return
+            }
+        }
+
 		user.Team = -1
 		user.Ready = false
 		user.Step = 1
@@ -113,6 +120,10 @@ func runGame(c *Client, msg []byte, roomId string) {
 			if !user.Ready {
 				allReady = false
 			}
+		}
+		// Minimum 4 players
+		if len(users) < 4 {
+			allReady = false
 		}
 		if allReady {
 			rand.Shuffle(len(users), func(i, j int) { users[i], users[j] = users[j], users[i] })
@@ -134,7 +145,6 @@ func runGame(c *Client, msg []byte, roomId string) {
 		}
 	}
 
-	// TODO - validate clues
 	if message.Type == "send-clues" {
 		var newClues []Clue
 		err := json.Unmarshal([]byte(message.Data), &newClues)
@@ -142,7 +152,15 @@ func runGame(c *Client, msg []byte, roomId string) {
 			log.Println(err)
 			return
 		}
+		// Minimum 3 clues
+		if len(newClues) != 3 {
+			return
+		}
 		for _, clue := range newClues {
+			// Clue cannot be empty
+			if clue.Word == "" {
+				return
+			}
 			clue.Id = uuid.New().String()
 			clue.Guessed = false
 			clues = append(clues, clue)

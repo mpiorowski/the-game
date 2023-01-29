@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -50,6 +51,25 @@ func main() {
 		}
 		serveWs(hub, c.Writer, c.Request, roomId)
 	})
+
+	// Run a goroutine everyday that will clear rooms that have been created more than 24 hours ago
+	ticker := time.NewTicker(24 * time.Hour)
+	quit := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+                for roomId, room := range rooms {
+                    if time.Now().Sub(room.Created) > 24 * time.Hour {
+                        delete(rooms, roomId)
+                    }
+                }
+			case <-quit:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
 
 	if err := router.Run(fmt.Sprintf("0.0.0.0:%v", PORT)); err != nil {
 		panic(err)

@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Clue, Score, User } from 'src/types';
+    import { fade } from 'svelte/transition';
     import Scoring from './scoring.svelte';
 
     export let users: User[] = [];
@@ -16,7 +17,7 @@
     );
 </script>
 
-<div class="text-center">
+<div class="text-center" in:fade>
     <h1 class="mb-6 font-bold">
         {#if sumOfScoresA > sumOfScoresB}
             Team A wins!

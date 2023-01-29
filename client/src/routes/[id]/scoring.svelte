@@ -1,12 +1,13 @@
 <script lang="ts">
     import type { Score } from 'src/types';
+    import { fade } from 'svelte/transition';
     export let score: Score[] = [];
 
     const sumOfScoresA = score.reduce((acc, curr) => acc + curr.teamClues[0].length, 0);
     const sumOfScoresB = score.reduce((acc, curr) => acc + curr.teamClues[1].length, 0);
 </script>
 
-<div class="text-center mb-2">
+<div class="text-center mb-2" in:fade>
     <h3 class="mb-2">Score</h3>
     <div class="grid grid-cols-3">
         <div>Round</div>
