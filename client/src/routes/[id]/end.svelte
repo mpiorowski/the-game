@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
+    import { Button } from '@mpiorowski/svelte-init';
     import type { Clue, Score, User } from 'src/types';
     import { fade } from 'svelte/transition';
     import Scoring from './scoring.svelte';
@@ -15,6 +17,10 @@
         (acc, curr) => acc + curr.teamClues[1].length,
         0
     );
+
+    const onReset = () => {
+        goto('/');
+    };
 </script>
 
 <div class="text-center" in:fade>
@@ -43,4 +49,5 @@
             </ul>
         </div>
     {/each}
+    <Button on:click={onReset}>Go back to rooms</Button>
 </div>

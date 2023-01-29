@@ -12,8 +12,7 @@
     import Users from './users.svelte';
     import Clues from './clues.svelte';
     import Guesses from './guesses.svelte';
-    import { Button, Spinner } from '@mpiorowski/svelte-init';
-    import { goto } from '$app/navigation';
+    import { Spinner } from '@mpiorowski/svelte-init';
     import Rounds from './rounds.svelte';
     import End from './end.svelte';
     import { fade } from 'svelte/transition';
@@ -55,14 +54,10 @@
             conn.send(JSON.stringify({ type: 'join', data: user, room: id }));
         };
     });
-
-    const onReset = () => {
-        goto('/');
-    };
 </script>
 
 <div class="h-full grid grid-rows-[1fr_auto]" in:fade>
-    <div class="overflow-auto mb-2">
+    <div class="overflow-auto p-1">
         {#if isLoading}
             <Spinner center />
         {:else if user?.step === 1 || !user}
@@ -89,5 +84,4 @@
             {/if}
         </div>
     {/if}
-    <Button on:click={onReset}>Go back to rooms</Button>
 </div>
