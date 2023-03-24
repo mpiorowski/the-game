@@ -7,7 +7,7 @@ primary_region = "arn"
 processes = []
 
 [env]
-  DOMAIN = "the-game-client.fly.dev"
+  DOMAIN = "www.thegame.live"
   PORT   = "8080"
   ENV    = "production"
 
