@@ -1,5 +1,5 @@
 # Development
-FROM node:19-alpine as dev
+FROM node:21-alpine as dev
 
 WORKDIR /app
 COPY package.json /app/package.json
@@ -11,7 +11,7 @@ COPY . .
 CMD ["npm", "run", "dev"]
 
 # Production
-FROM node:19-alpine as prod
+FROM node:21-alpine as prod
 WORKDIR /app
 COPY --from=dev /app /app
 ENV NODE_ENV=production

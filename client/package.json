@@ -1,5 +1,5 @@
 {
-	"name": "client2",
+	"name": "client",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -31,7 +31,6 @@
 	"dependencies": {
 		"@mpiorowski/svelte-init": "^2.0.4",
 		"@sveltejs/adapter-node": "^1.2.3",
-		"@sveltejs/adapter-vercel": "^2.4.0",
 		"js-circle-progress": "^0.2.4",
 		"progressbar.js": "^1.1.0",
 		"zod": "^3.20.2"

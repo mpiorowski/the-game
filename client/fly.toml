@@ -1,40 +1,55 @@
-# fly.toml file generated for the-game-client on 2023-03-24T02:05:15+01:00
+# fly.toml app configuration file generated for the-game-client on 2024-03-09T13:40:06+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "the-game-client"
-kill_signal = "SIGINT"
-kill_timeout = 5
-primary_region = "arn"
-processes = []
-
-[env]
-  VITE_API_URL = "https://the-game-server.fly.dev"
-  VITE_WS_URL = "ws://the-game-server.fly.dev"
+app = 'the-game-client'
+primary_region = 'arn'
+kill_signal = 'SIGINT'
+kill_timeout = '5s'
 
 [experimental]
   auto_rollback = true
 
-[[services]]
-  http_checks = []
+[build]
+
+[env]
+  VITE_API_URL = 'https://the-game-server.fly.dev'
+  VITE_WS_URL = 'ws://the-game-server.fly.dev'
+
+[http_service]
   internal_port = 3000
-  processes = ["app"]
-  protocol = "tcp"
-  script_checks = []
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[services]]
+  protocol = 'tcp'
+  internal_port = 3000
+  processes = ['app']
+
+[[services.ports]]
+    port = 80
+    handlers = ['http']
+    force_https = true
+
+[[services.ports]]
+    port = 443
+    handlers = ['tls', 'http']
+
   [services.concurrency]
+    type = 'connections'
     hard_limit = 25
     soft_limit = 20
-    type = "connections"
 
-  [[services.ports]]
-    force_https = true
-    handlers = ["http"]
-    port = 80
+[[services.tcp_checks]]
+    interval = '15s'
+    timeout = '2s'
+    grace_period = '1s'
 
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
-
-  [[services.tcp_checks]]
-    grace_period = "1s"
-    interval = "15s"
-    restart_limit = 0
-    timeout = "2s"
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
