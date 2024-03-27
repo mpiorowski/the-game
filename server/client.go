@@ -130,7 +130,7 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, roomId string) {
 		if ENV == "production" {
 			url = "https://" + DOMAIN
 		}
-		if r.Header.Get("Origin") == url {
+		if r.Header.Get("Origin") == url || r.Header.Get("Origin") == "https://the-game-client.fly.dev" {
 			return true
 		}
 		return false

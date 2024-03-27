@@ -35,8 +35,8 @@ func main() {
 	}
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{url}
-	config.AllowCredentials = true
+	config.AllowOrigins = []string{url, "https://the-game-client.fly.dev"}
+    config.AllowCredentials = true
 	config.AllowHeaders = []string{"Authorization", "Content-Type"}
 	router.Use(cors.New(config))
 
@@ -60,7 +60,7 @@ func main() {
 			select {
 			case <-ticker.C:
                 for roomId, room := range rooms {
-                    if time.Now().Sub(room.Created) > 24 * time.Hour {
+                    if time.Since(room.Created) > 24 * time.Hour {
                         delete(rooms, roomId)
                     }
                 }
