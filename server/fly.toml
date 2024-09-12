@@ -7,7 +7,7 @@ primary_region = "arn"
 processes = []
 
 [env]
-  DOMAIN = "www.thegame.live"
+  DOMAIN = "thegame.live"
   PORT   = "8080"
   ENV    = "production"
 
