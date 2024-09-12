@@ -3,4 +3,4 @@ The best party game ever created :) Drink some and jump right into it with Your 
 
 Build using SvelteKit + Go + Websocket + GCP
 
-https://www.thegame.live
+https://thegame.live
